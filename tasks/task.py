@@ -14,17 +14,28 @@ def query(data: DataType, selector: ModifierFunc,
     :param filters: Any number of results of `field_filter` function calls
     :return: Filtered data
     """
-    pass
+    result = selector(data)  # Apply column selection
+    
+    for filter_func in filters:  # Apply filters
+        result = filter_func(result)
+    
+    return result
 
 
 def select(*columns: str) -> ModifierFunc:
     """Return function that selects only specific columns from dataset"""
-    pass
+    def select_columns(data: DataType) -> DataType:
+        return [{col: entry[col] for col in columns if col in entry} for entry in data]
+    
+    return select_columns
 
 
 def field_filter(column: str, *values: Any) -> ModifierFunc:
     """Return function that filters specific column to be one of `values`"""
-    pass
+    def filter_column(data: DataType) -> DataType:
+        return [entry for entry in data if entry.get(column) in values]
+    
+    return filter_column
 
 
 def test_query():
@@ -42,4 +53,3 @@ def test_query():
 
 if __name__ == "__main__":
     test_query()
-
